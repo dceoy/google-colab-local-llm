@@ -32,3 +32,14 @@ if [[ ! -d text-generation-webui ]]; then
 fi
 
 pip install -q --no-cache-dir -r text-generation-webui/requirements.txt
+
+LLM_URLS=( \
+  'https://huggingface.co/TheBloke/Llama-2-70B-Chat-GGUF/resolve/main/llama-2-70b-chat.Q5_K_M.gguf' \   # 48.8 GB
+  'https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q5_K_M.gguf' \  # 32.2 GB
+  'https://huggingface.co/mmnga/ELYZA-japanese-Llama-2-13b-fast-instruct-gguf/blob/main/ELYZA-japanese-Llama-2-13b-fast-instruct-q8_0.gguf' \  # 14 GB
+  'https://huggingface.co/mmnga/RakutenAI-7B-chat-gguf/blob/main/RakutenAI-7B-chat-q8_0.gguf' \  # 7.84 GB
+)
+
+for u in "${LLM_URLS[@]}"; do
+  aria2c --dir text-generation-webui/models --console-log-level=warn -x 16 -s 16 -k 1M "${u}"
+done
