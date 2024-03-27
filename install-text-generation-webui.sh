@@ -24,9 +24,21 @@ case "${OSTYPE}" in
     ;;
 esac
 
-[[ ! -d text-generation-webui ]] || rm -rf text-generation-webui
 curl -sSLO https://raw.githubusercontent.com/dceoy/print-github-tags/master/print-github-tags
 chmod +x print-github-tags
+
+[[ ! -d llama.cpp ]] || rm -rf llama.cpp
+./print-github-tags --release --latest --tar ggerganov/llama.cpp \
+  | xargs -t curl -sSL -o llama.cpp.tar.gz
+tar xf llama.cpp.tar.gz && rm -f llama.cpp.tar.gz
+mv llama.cpp-* llama.cpp
+mkdir llama.cpp/build
+cd llama.cpp/build
+cmake .. -DLLAMA_CUBLAS=ON
+cmake --build . --config Release
+cd ../..
+
+[[ ! -d text-generation-webui ]] || rm -rf text-generation-webui
 ./print-github-tags --release --latest --tar oobabooga/text-generation-webui \
   | xargs -t curl -sSL -o text-generation-webui.tar.gz
 tar xf text-generation-webui.tar.gz && rm -f text-generation-webui.tar.gz
@@ -37,6 +49,8 @@ pip install -q --no-cache-dir -r text-generation-webui/requirements.txt
 LLM_URLS=( \
   # 30.6 GB
   'https://huggingface.co/TheBloke/Llama-2-70B-Chat-GGUF/resolve/main/llama-2-70b-chat.Q5_K_S.gguf' \
+  # 41.4 GB
+  'https://huggingface.co/TheBloke/Llama-2-70B-Chat-GGUF/resolve/main/llama-2-70b-chat.Q4_K_M.gguf' \
   # 48.8 GB
  'https://huggingface.co/TheBloke/Llama-2-70B-Chat-GGUF/resolve/main/llama-2-70b-chat.Q5_K_M.gguf' \
   # 36.7 GB, 36.6 GB
